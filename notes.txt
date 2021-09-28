@@ -8,3 +8,8 @@ Separating different parts of an HTML document into different files, helping kee
 Embedded JavaScript templates (EJS) can be used as an alternative template engine.
 
 view this walkthough -> https://www.digitalocean.com/community/tutorials/how-to-use-ejs-to-template-your-node-application
+
+Nodemon is a utility that will monitor for any changes in our source code and automatically restart our server. Perfect for development. TO INSTALL in terminal as a development dependency.->>  npm install --save-dev nodemon
+next run our application with nodemon by enerting this in the terminal. ->> ./node_modules/.bin/nodemon -L express_server.js
+From now on, start the server by running npm start
+
