@@ -1,0 +1,10 @@
+Why are templates helpful?
+
+For several reasons, such as:
+
+Keeping server logic (in this case JavaScript) separate from markup (HTML), making it easier to modify or debug one without affecting the other
+Separating different parts of an HTML document into different files, helping keep the length of HTML files short and manageable
+
+Embedded JavaScript templates (EJS) can be used as an alternative template engine.
+
+view this walkthough -> https://www.digitalocean.com/community/tutorials/how-to-use-ejs-to-template-your-node-application
