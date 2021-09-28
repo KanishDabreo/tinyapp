@@ -59,6 +59,7 @@ app.get("/urls/:shortURL", (req, res) => {
   };
   res.render("urls_show", templateVars);
 });
+
 //Sending HTML
 //making a get request
 app.get("/hello", (req, res) => {
@@ -72,9 +73,10 @@ app.post("/urls", (req, res) => {
   console.log(shortURL)
 
   urlDatabase[shortURL] = longURL;
-  //console.log(urlDatabase);
+  console.log(urlDatabase);
   res.send("Ok");         // Respond with 'Ok' (we will replace this)
 });
+
 
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
