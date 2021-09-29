@@ -95,7 +95,7 @@ app.post("/urls/:shortURL/edit", (req, res) => {
   //delete operator
   urlDatabase[shortURL]
   console.log(shortURL);
-  res.redirect("/urls");
+  res.redirect("/urls/show");
 });
 
 app.get("/u/:shortURL", (req, res) => {

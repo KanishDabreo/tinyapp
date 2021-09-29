@@ -6,7 +6,7 @@
 
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-  <title>TinyApp</title>
+  <title><b>TinyApp</b></title>
 </head>
 <body>
   <header>
@@ -27,8 +27,9 @@
       <tbody>
         <% for(let url in urls) { %>
           <tr>
-            <td><%= url %></td>
-            <td><%= urls[url] %></td>
+            <td><a href="<%= url %>" class="link-success"><%= url %></a></td>
+            <td><a href="<%= urls[url] %>" class="link-success"><%= urls[url] %></a>
+            </td>
             <td><form method="POST" action="/urls/<%=url%>/edit">
               <button type="submit" class="btn btn-outline-primary">Edit</button>
               </form></td>  
