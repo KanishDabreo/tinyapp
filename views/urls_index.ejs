@@ -27,10 +27,10 @@
       <tbody>
         <% for(let url in urls) { %>
           <tr>
-            <td><a href="<%= url %>" class="link-success"><%= url %></a></td>
+            <td><a href="/u/<%= url %>" class="link-success"><%= url %></a></td>
             <td><a href="<%= urls[url] %>" class="link-success"><%= urls[url] %></a>
             </td>
-            <td><form method="POST" action="/urls/<%=url%>/edit">
+            <td><form method="GET" action="/urls/<%=url%>">
               <button type="submit" class="btn btn-outline-info">Edit</button>
               </form></td>  
             <td><form method="POST" action="/urls/<%=url%>/delete">
