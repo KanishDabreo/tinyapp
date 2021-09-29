@@ -31,10 +31,10 @@
             <td><a href="<%= urls[url] %>" class="link-success"><%= urls[url] %></a>
             </td>
             <td><form method="POST" action="/urls/<%=url%>/edit">
-              <button type="submit" class="btn btn-outline-primary">Edit</button>
+              <button type="submit" class="btn btn-outline-info">Edit</button>
               </form></td>  
             <td><form method="POST" action="/urls/<%=url%>/delete">
-            <button type="submit" class="btn btn-outline-danger">Delete</button>
+            <button type="submit" class="btn btn-outline-danger"data-toggle="popover" title="Are you sure?">Delete</button>
             </form></td>        
           </tr>
         <% } %>
