@@ -69,6 +69,7 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
+//to  delete url on main page
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
   //delete operator
@@ -82,10 +83,19 @@ app.post("/urls", (req, res) => {
   const longURL = req.body.longURL;
   const shortURL = generateRandomString();
   console.log(shortURL)
-
+  
   urlDatabase[shortURL] = longURL;
   console.log(urlDatabase);
   res.redirect("/urls");         // Respond with 'Ok' (replaced with redirect to homepage)
+});
+
+//to edit url on main page
+app.post("/urls/:shortURL/edit", (req, res) => {
+  const shortURL = req.params.shortURL;
+  //delete operator
+  urlDatabase[shortURL]
+  console.log(shortURL);
+  res.redirect("/urls");
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -93,4 +103,12 @@ app.get("/u/:shortURL", (req, res) => {
   // const longURL = ...
   const longURL = urlDatabase[shortURL]
   res.redirect(longURL);
+});
+
+app.post("/urls/:id", (req, res) => {
+  const shortURL = req.params.shortURL;
+  //delete operator
+  delete urlDatabase[shortURL]
+  console.log(shortURL);
+  res.redirect("/urls");
 });
