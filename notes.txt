@@ -16,10 +16,12 @@ From now on, start the server by running npm start
 bootstrap for styling ->> https://getbootstrap.com/docs/4.0/components/buttons/ 
 
 cookie installation ->> https://www.npmjs.com/package/cookie-parser
+cookie documentation ->> https://github.com/expressjs/cookie-parser
 interminal $ npm install cookie-parser
 API
 const express = require('express')
 const cookieParser = require('cookie-parser')
- 
 const app = express()
 app.use(cookieParser())
+ 
+res.cookie/ res.clearCookie ->> https://expressjs.com/en/api.html
