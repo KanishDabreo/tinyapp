@@ -25,3 +25,31 @@ const app = express()
 app.use(cookieParser())
  
 res.cookie/ res.clearCookie ->> https://expressjs.com/en/api.html
+
+
+ <% if (user) { %>
+            <form method="POST" action="/logout" class="form-inline">
+              <label> Logged in as: <%= user.email %> </label>
+              <button type="submit" class="btn btn-outline-info">Logout</button>
+            </form>
+          <% }  else { %> 
+              <a href="/login"><button type="submit" class="btn btn-info" data-toggle="popover" title="Hello again">Login</button></a>
+              <a href="/register"><button type="submit" class="btn btn-info" data-toggle="popover" title="Welcome">Register</button></a>
+          <% } %>  
+
+before refactor
+app.post("/login", (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+
+//   if (userDatabase[email]) {
+//     if (userDatabase[email].password === password) {
+//       res.cookie('email', email);
+//       return res.redirect("/urls");
+//     }
+//     console.log('incorrect password');
+//   return res.redirect("/urls");
+//   }
+//   console.log("cannot find email");
+//   return res.redirect("/urls");
+// });
