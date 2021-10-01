@@ -1,13 +1,12 @@
-const PORT = 8080; // default port 8080
+const PORT = 8080;
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
-const { authenticateUser } = require("./helpers");
+const { findUserByEmail } = require("./helpers");
 
-//////////////////       Middleware      /////////////////
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.use(cookieParser());
@@ -15,28 +14,8 @@ app.use(cookieSession({
   name: 'session',
   keys: ['key1', 'key2']
 }));
-// app.use((req, res, next) => {
-//   const email = req.session.email;
-//   const path = req.path;
-//   const allowedPaths = ["/urls", "/login"];
 
-//   if (allowedPaths.includes(path)) {
-//     return next();
-//   }
-//   if (!email) {
-//     return res.redirect("/urls");
-//   }
-//   next();
-// });
-
-//////////////////       URL DATABASE      /////////////////
-// const urlDatabase = {
-//   "b2xVn2": "http://www.lighthouselabs.ca",
-//   "9sm5xK": "http://www.google.com",
-//   "6an4dK": "http://www.artisticperception.ca"
-// };
-//urlDatabase[key].longURL to access "http://www.lighthouselabs.ca"
-//urlDatabase[key].userID to access "aJ48lW"
+//////////////////              URL DATABASE           /////////////////
 const urlDatabase = {
   b2xVn2: {
     longURL: "http://www.lighthouselabs.ca",
@@ -55,7 +34,7 @@ const urlDatabase = {
     userID: "aJ48lW"
   }
 };
-//////////////////       USER DATABASE      /////////////////
+//////////////////            USER DATABASE           /////////////////
 const users = {
   user1: {
     id: "userRandomID",
@@ -68,55 +47,41 @@ const users = {
     password: "$2a$10$91pZhj0gErbt8Rucv2.uYOf4DAwlFedwRJg5A7SkhAwqOyT6A4lv2"
   },
   user3: {
-   id: "user3RandomID",
-   email: "user3@example.com",
-   password: "$2a$10$91pZhj0gErbt8Rucv2.uYOf4DAwlFedwRJg5A7SkhAwqOyT6A4lv2"
+    id: "user3RandomID",
+    email: "user3@example.com",
+    password: "$2a$10$91pZhj0gErbt8Rucv2.uYOf4DAwlFedwRJg5A7SkhAwqOyT6A4lv2"
   },
 };
-// const userDatabase = {
-//   "user@example.com": user1,
-//   "user2@example.com": user2,
-//   "user3@example.com": user3,
-// };
 
-//////////////////       HELPERS      /////////////////
-//////////////////string generator for short url///////////////
+//////////////////           HELPER FUNCTIONS        /////////////////
 const generateRandomString = function() {
   let randomString = Math.random().toString(36).substring(6);
   return randomString;
-  // let newNum = '';
-  // const sample = 'abcdefghijklmnopqrstuvwxyz123456789'.split('');
-  // for (let i = 0; i < 6; i++) {
-  //   const randomIndex = Math.floor(Math.random() * sample.length);
-  //   newNum =+ randomIndex;
-  //   console.log('this randomIndex:', randomIndex);
-  // }
-  // //const blank = Math.random().toString(36).substring(2, 8);  alternative from lecture
-  // return newNum;
 };
 
-const createUser = function (email, password, users) {
+const authenticateUser = (users, email, password) => {
+  if (users[email]) {
+    //if (userDb[email].password === password) {
+    if (bcrypt.compareSync(password, users[email].password)) {
+      return {user: users[email], error: null};
+    }
+    return {username: null, error: 'incorrect password'};
+  }
+  return {username: null, error: 'incorrect email'};
+};
+
+const createUser = function(email, password, users) {
   const userId = generateRandomString();
   users[userId] = {
     id: userId,
     email,
     password
   };
-  console.log(users)
+  console.log(users);
   return userId;
 };
 
-const findUserByEmail = function(email, users) {
-  for (let userId in users) {
-    const user = users[userId];
-    if (email === user.email) {
-      return user;
-    }
-  }
-  return false;
-};
-
-const urlsForUser = function(username) {
+const urlsForUser = function(id) {
   let userUrl = {};
   for (let key in urlDatabase) {
     if (urlDatabase[key].userId === username) {
@@ -142,13 +107,13 @@ app.get("/hello", (req, res) => {
 
 /////////////////            MAINPAGE/INDEX          /////////////////
 app.get("/urls", (req, res) => {
-  username = users[req.session.user_id];
+  const username = users[req.session.user_id];
   const templateVars = {
     urls: urlDatabase
   };
   res.render("urls_index", templateVars);
 });
-/////////////////           URLS_NEW CREATE NEW URL          /////////////////
+/////////////////       URLS_NEW CREATE NEW URL      /////////////////
 app.get("/urls/new", (req, res) => {
   const username = users[req.session.user_id];
   const templateVars = {
@@ -159,7 +124,7 @@ app.get("/urls/new", (req, res) => {
   }
   res.render("urls_new", templateVars);
 });
-/////////////////            URLS_SHOW          /////////////////
+/////////////////             URLS_SHOW              /////////////////
 app.get("/urls/:shortURL", (req, res) => {
   const username = users[req.session.user_id];
   const shortURL = req.params.shortURL;
@@ -178,7 +143,7 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   // const longURL = ...
-  const longURL = urlDatabase[shortURL].longURL;;
+  const longURL = urlDatabase[shortURL].longURL;
   res.redirect(longURL);
 });
 /////////////////           REGISTER GET          /////////////////
@@ -188,7 +153,7 @@ app.get("/register", (req, res) => {
   const templateVars = {
     username: null
   };
-  console.log("we registered")
+  console.log("we registered");
   // if (loggedUsername) {
   //   return res.redirect('/urls');
   // }
@@ -198,7 +163,7 @@ app.get("/register", (req, res) => {
 app.get("/login", (req, res) => {
   const templateVars = {
     username: null
-  }
+  };
   // display the register form
   res.render('urls_login', templateVars);
 });
@@ -257,7 +222,7 @@ app.post("/login", (req, res) => {
 
 /////////////////            LOGOUT  POST         /////////////////
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
+  req.session.user_id = null;
   res.redirect("/urls");
 });
 //res.clearCookie(name [, options])

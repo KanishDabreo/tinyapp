@@ -1,15 +1,13 @@
-/////////////////           USER AUTHENTICATION        /////////////////
 const bcrypt = require('bcryptjs');
 
-const authenticateUser = (users, email, password) => {
-  if (users[email]) {
-    //if (userDb[email].password === password) {
-    if (bcrypt.compareSync(password, userDb[email].password)) {
-      return {user: users[email], error: null};
+const findUserByEmail = function(email, users) {
+  for (let userId in users) {
+    const user = users[userId];
+    if (email === user.email) {
+      return user;
     }
-    return {username: null, error: 'incorrect password'};
   }
-  return {username: null, error: 'incorrect email'};
+  return false;
 };
 
-module.exports = { authenticateUser };
+module.exports = { findUserByEmail };
