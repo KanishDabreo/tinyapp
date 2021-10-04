@@ -19,19 +19,19 @@ app.use(cookieSession({
 const urlDatabase = {
   b2xVn2: {
     longURL: "http://www.lighthouselabs.ca",
-    userID: "aJ48lW"
+    userID: "userRandomID"
   },
   s9m5xK: {
     longURL: "http://www.google.com",
-    userID: "aJ48lW"
+    userID: "userRandomID"
   },
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
-    userID: "aJ48lW"
+    userID: "user2RandomID"
   },
   i3BoGr: {
     longURL: "http://www.artisticperception.ca",
-    userID: "aJ48lW"
+    userID: "user3RandomID"
   }
 };
 //////////////////            USER DATABASE           /////////////////
@@ -97,7 +97,14 @@ const createUser = function(email, password, users) {
 
 /////////////////  Adding Routes with GET REQUESTS    /////////////////
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  const username = users[req.session.user_id];
+  const templateVars = {
+    username,
+  };
+  if (!username) {
+    return res.render("urls_login", templateVars);
+  }
+  res.redirect("/urls");
 });
 
 app.get("/urls.json", (req, res) => {
@@ -110,9 +117,16 @@ app.get("/hello", (req, res) => {
 /////////////////            MAINPAGE/INDEX          /////////////////
 app.get("/urls", (req, res) => {
   const username = users[req.session.user_id];
+  const ownedUrls = {}; //result of loop
+  for(const elem in urlDatabase) {
+    let currUrl = urlDatabase[elem]
+    if(currUrl.userID === username.id) {
+    ownedUrls[elem] = currUrl
+    }
+  }
   const templateVars = {
     username,
-    urls: urlDatabase
+    urls: ownedUrls
   };
   if (!username) {
     return res.render("urls_login", templateVars);
@@ -176,13 +190,14 @@ app.get("/login", (req, res) => {
   res.render('urls_login', templateVars);
 });
 
-// Log the POST request body to the console
+///////////////////     make new URL(urls_new)    /////////////////////
 app.post("/urls", (req, res) => {
   const username = users[req.session.user_id];
   const longURL = req.body.longURL;
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = {};
   urlDatabase[shortURL].longURL = longURL;
+  urlDatabase[shortURL].userID = username.id;
   if (!username) {
     res.status(400).send('Must Login');
   }
@@ -190,7 +205,7 @@ app.post("/urls", (req, res) => {
 });
 
 
-/////////    edit post ///////////////////
+///////////////////           EDIT POST (urls_show)           ///////////////////
 app.post("/urls/:shortURL", (req, res) => {
   const username = users[req.session.user_id];
   const shortURL = req.params.shortURL;
@@ -224,30 +239,13 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect("/urls");
 });
 
-//////////////////              EDIT URL           /////////////////
-app.post("/urls/:shortURL/edit", (req, res) => {
-  const username = users[req.session.user_id];
-  const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL].longURL;
-  urlDatabase[shortURL];
-  const templateVars = {
-    username,
-    shortURL,
-    longURL
-  };
-  if (!username) {
-    return res.render("urls_login", templateVars);
-  }
-  res.redirect("/urls/show");
-});
-
 /////////////////             LOGIN  POST          /////////////////
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   // const userFound = findUsersByEmail(users, email);
   const username = authenticateUser(users, email, password);
-  if (username) {
+  if (username.user) {
     req.session.user_id = username.user.id;
     return res.redirect("/urls");
   }
