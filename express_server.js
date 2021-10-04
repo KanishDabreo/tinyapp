@@ -130,6 +130,7 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const username = users[req.session.user_id];
   const shortURL = req.params.shortURL;
+  let urlobj = urlDatabase[shortURL];
   const templateVars = {
     username,
     shortURL,
@@ -184,11 +185,13 @@ app.post("/urls", (req, res) => {
   res.redirect("/urls");
 });
 
+
+/////////    edit post ///////////////////
 app.post("/urls/:shortURL", (req, res) => {
   const username = users[req.session.user_id];
   const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL].longURL;
-  urlDatabase[shortURL] = longURL;
+  const longURL = req.body.longURL;
+  urlDatabase[shortURL].longURL = longURL;
   const templateVars = {
     username,
     shortURL,
