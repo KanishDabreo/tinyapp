@@ -36,17 +36,17 @@ const urlDatabase = {
 };
 //////////////////            USER DATABASE           /////////////////
 const users = {
-  user1: {
+  userRandomID: {
     id: "userRandomID",
     email: "user@example.com",
-    password: "$2a$10$91pZhj0gErbt8Rucv2.uYOf4DAwlFedwRJg5A7SkhAwqOyT6A4lv2"
+    password: bcrypt.hashSync('1234', 10)
   },
-  user2: {
+  user2RandomID: {
     id: "user2RandomID",
     email: "user2@example.com",
     password: "$2a$10$91pZhj0gErbt8Rucv2.uYOf4DAwlFedwRJg5A7SkhAwqOyT6A4lv2"
   },
-  user3: {
+  user3RandomID: {
     id: "user3RandomID",
     email: "user3@example.com",
     password: "$2a$10$91pZhj0gErbt8Rucv2.uYOf4DAwlFedwRJg5A7SkhAwqOyT6A4lv2"
@@ -60,14 +60,18 @@ const generateRandomString = function() {
 };
 
 const authenticateUser = (users, email, password) => {
-  if (users[email]) {
-    //if (userDb[email].password === password) {
-    if (bcrypt.compareSync(password, users[email].password)) {
-      return {user: users[email], error: null};
+  for(const elem in users) {
+    let currUser = users[elem];
+    if (currUser.email === email) {
+      //if (userDb[email].password === password) {
+      if (bcrypt.compareSync(password, currUser.password)) {
+        console.log("correct password");
+        return {user: currUser, error: null};
+      }
+      return {user: null, error: 'incorrect password'};
     }
-    return {username: null, error: 'incorrect password'};
+    return {user: null, error: 'incorrect email'};
   }
-  return {username: null, error: 'incorrect email'};
 };
 
 const createUser = function(email, password, users) {
@@ -244,7 +248,7 @@ app.post("/login", (req, res) => {
   // const userFound = findUsersByEmail(users, email);
   const username = authenticateUser(users, email, password);
   if (username) {
-    req.session.user_id = username.userId;
+    req.session.user_id = username.user.id;
     return res.redirect("/urls");
   }
   res.status(400).send('Incorrect password or email');
