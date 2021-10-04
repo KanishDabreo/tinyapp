@@ -85,16 +85,6 @@ const createUser = function(email, password, users) {
   return userId;
 };
 
-// const urlsForUser = function(id) {
-//   let userUrl = {};
-//   for (let key in urlDatabase) {
-//     if (urlDatabase[key].userId === username) {
-//       userUrl[key] = urlDatabase[key];
-//     }
-//   }
-//   return userUrl;
-// };
-
 /////////////////  Adding Routes with GET REQUESTS    /////////////////
 app.get("/", (req, res) => {
   const username = users[req.session.user_id];
@@ -196,7 +186,7 @@ app.get("/login", (req, res) => {
   res.render('urls_login', templateVars);
 });
 
-///////////////////     make new URL(urls_new)    /////////////////////
+///////////////////     make new URL(urls_new)    //////////////////
 app.post("/urls", (req, res) => {
   const username = users[req.session.user_id];
   const longURL = req.body.longURL;
@@ -211,7 +201,7 @@ app.post("/urls", (req, res) => {
 });
 
 
-///////////////////           EDIT POST (urls_show)           ///////////////////
+///////////////////      EDIT POST (urls_show)    ///////////////////
 app.post("/urls/:shortURL", (req, res) => {
   const username = users[req.session.user_id];
   const shortURL = req.params.shortURL;
