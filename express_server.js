@@ -121,7 +121,7 @@ app.get("/urls", (req, res) => {
     username,
   };
   if (!username) {
-    return res.render("urls_login", templateVars);
+    return res.status(400).send('Please Login');
   }
   const ownedUrls = {}; //result of loop
   for(const elem in urlDatabase) {
