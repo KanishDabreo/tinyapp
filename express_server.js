@@ -160,7 +160,7 @@ app.get("/urls/:shortURL", (req, res) => {
   if (!username) {
     return res.status(400).send('Please Login');
   }
-  if (username !== urlobj.userID) {
+  if (username.id !== urlobj.userID) {
     return res.status(400).send('U dont own dis');
   }
   res.render("urls_show", templateVars);
@@ -207,7 +207,7 @@ app.post("/urls", (req, res) => {
   if (!username) {
     res.status(400).send('Must Login');
   }
-  res.redirect("/urls");
+  res.redirect(`/urls/${shortURL}`);
 });
 
 
