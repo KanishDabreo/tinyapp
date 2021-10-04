@@ -117,6 +117,12 @@ app.get("/hello", (req, res) => {
 /////////////////            MAINPAGE/INDEX          /////////////////
 app.get("/urls", (req, res) => {
   const username = users[req.session.user_id];
+  const templateVars = {
+    username,
+  };
+  if (!username) {
+    return res.render("urls_login", templateVars);
+  }
   const ownedUrls = {}; //result of loop
   for(const elem in urlDatabase) {
     let currUrl = urlDatabase[elem]
@@ -124,10 +130,7 @@ app.get("/urls", (req, res) => {
     ownedUrls[elem] = currUrl
     }
   }
-  const templateVars = {
-    username,
-    urls: ownedUrls
-  };
+  templateVars.urls = ownedUrls;
   if (!username) {
     return res.render("urls_login", templateVars);
   }
@@ -254,7 +257,7 @@ app.post("/login", (req, res) => {
 
 /////////////////             LOGOUT  POST         /////////////////
 app.post("/logout", (req, res) => {
-  req.session.user_id = null;
+  req.session = null;
   res.redirect("/urls");
 });
 
