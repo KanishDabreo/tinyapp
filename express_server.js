@@ -81,19 +81,18 @@ const createUser = function(email, password, users) {
   return userId;
 };
 
-const urlsForUser = function(id) {
-  let userUrl = {};
-  for (let key in urlDatabase) {
-    if (urlDatabase[key].userId === username) {
-      userUrl[key] = urlDatabase[key];
-    }
-  }
-  return userUrl;
-};
+// const urlsForUser = function(id) {
+//   let userUrl = {};
+//   for (let key in urlDatabase) {
+//     if (urlDatabase[key].userId === username) {
+//       userUrl[key] = urlDatabase[key];
+//     }
+//   }
+//   return userUrl;
+// };
 
 /////////////////  Adding Routes with GET REQUESTS    /////////////////
 app.get("/", (req, res) => {
-  const id = req.session.user_id;
   res.send("Hello!");
 });
 
@@ -104,13 +103,16 @@ app.get("/urls.json", (req, res) => {
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
-
 /////////////////            MAINPAGE/INDEX          /////////////////
 app.get("/urls", (req, res) => {
   const username = users[req.session.user_id];
   const templateVars = {
+    username,
     urls: urlDatabase
   };
+  if (!username) {
+    return res.render("urls_login", templateVars);
+  }
   res.render("urls_index", templateVars);
 });
 /////////////////       URLS_NEW CREATE NEW URL      /////////////////
@@ -124,26 +126,27 @@ app.get("/urls/new", (req, res) => {
   }
   res.render("urls_new", templateVars);
 });
-/////////////////             URLS_SHOW              /////////////////
+/////////////////             URLS_SHOW             /////////////////
 app.get("/urls/:shortURL", (req, res) => {
   const username = users[req.session.user_id];
   const shortURL = req.params.shortURL;
   const templateVars = {
     username,
     shortURL,
-    longURL: urlDatabase[shortURL]
+    longURL: urlDatabase[shortURL].longURL
   };
   if (!username) {
     return res.render("urls_login", templateVars);
   }
   res.render("urls_show", templateVars);
 });
-
-//redirect to longUrl
+/////////////////         REDIRECT TO longURL       /////////////////
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  // const longURL = ...
   const longURL = urlDatabase[shortURL].longURL;
+  if (!longURL) {
+    res.status(400).send('Does Not Exist');
+  }
   res.redirect(longURL);
 });
 /////////////////           REGISTER GET          /////////////////
@@ -159,7 +162,7 @@ app.get("/register", (req, res) => {
   // }
   res.render("urls_register", templateVars);
 });
-/////////////////            LOGIN GET          /////////////////
+/////////////////             LOGIN GET           /////////////////
 app.get("/login", (req, res) => {
   const templateVars = {
     username: null
@@ -168,46 +171,70 @@ app.get("/login", (req, res) => {
   res.render('urls_login', templateVars);
 });
 
+// Log the POST request body to the console
 app.post("/urls", (req, res) => {
-  //console.log(req.body);  // Log the POST request body to the console
   const username = users[req.session.user_id];
   const longURL = req.body.longURL;
   const shortURL = generateRandomString();
-  console.log(shortURL);
-  urlDatabase[shortURL] = longURL;
-  console.log(urlDatabase);
+  urlDatabase[shortURL] = {};
+  urlDatabase[shortURL].longURL = longURL;
+  if (!username) {
+    res.status(400).send('Must Login');
+  }
   res.redirect("/urls");
 });
 
 app.post("/urls/:shortURL", (req, res) => {
   const username = users[req.session.user_id];
   const shortURL = req.params.shortURL;
-  const longURL = req.body.longURL;
+  const longURL = urlDatabase[shortURL].longURL;
   urlDatabase[shortURL] = longURL;
-  //console.log(shortURL);
+  const templateVars = {
+    username,
+    shortURL,
+    longURL
+  };
   if (!username) {
     return res.render("urls_login", templateVars);
   }
   res.redirect("/urls");
 });
 
-//////////////////             DELETE URL          /////////////////
+//////////////////            DELETE URL           /////////////////
 app.post("/urls/:shortURL/delete", (req, res) => {
+  const username = users[req.session.user_id];
   const shortURL = req.params.shortURL;
+  const longURL = urlDatabase[shortURL].longURL;
   delete urlDatabase[shortURL];
-  console.log(shortURL);
+  const templateVars = {
+    username,
+    shortURL,
+    longURL
+  };
+  if (!username) {
+    return res.render("urls_login", templateVars);
+  }
   res.redirect("/urls");
 });
 
-//////////////////             EDIT URL          /////////////////
+//////////////////              EDIT URL           /////////////////
 app.post("/urls/:shortURL/edit", (req, res) => {
+  const username = users[req.session.user_id];
   const shortURL = req.params.shortURL;
+  const longURL = urlDatabase[shortURL].longURL;
   urlDatabase[shortURL];
-  console.log(shortURL);
+  const templateVars = {
+    username,
+    shortURL,
+    longURL
+  };
+  if (!username) {
+    return res.render("urls_login", templateVars);
+  }
   res.redirect("/urls/show");
 });
 
-/////////////////            LOGIN  POST         /////////////////
+/////////////////             LOGIN  POST          /////////////////
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -220,13 +247,11 @@ app.post("/login", (req, res) => {
   res.status(400).send('Incorrect password or email');
 });
 
-/////////////////            LOGOUT  POST         /////////////////
+/////////////////             LOGOUT  POST         /////////////////
 app.post("/logout", (req, res) => {
   req.session.user_id = null;
   res.redirect("/urls");
 });
-//res.clearCookie(name [, options])
-//res.clearCookie('name', { path: '/admin' })
 
 /////////////////           REGISTER POST         /////////////////
 app.post("/register", (req, res) => {

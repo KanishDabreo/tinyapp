@@ -31,7 +31,7 @@
             <td><a href="<%= urls[url].longURL %>" class="link-success"><%= urls[url].longURL %></a>
             </td>
             <td>
-              <a href="/urls/<%=urls[url]%>" class="btn btn-outline-info"data-toggle="popover" title="Are you sure?">Edit</button>
+              <a href="/urls/<%=url%>" class="btn btn-outline-info"data-toggle="popover" title="Are you sure?">Edit</button>
             </td>  
             <td><form method="POST" action="/urls/<%=url%>/delete">
             <button type="submit" class="btn btn-outline-danger"data-toggle="popover" title="Are you sure?">Delete</button>
