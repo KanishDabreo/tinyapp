@@ -158,7 +158,10 @@ app.get("/urls/:shortURL", (req, res) => {
     longURL: urlDatabase[shortURL].longURL
   };
   if (!username) {
-    return res.render("urls_login", templateVars);
+    return res.status(400).send('Please Login');
+  }
+  if (username !== urlobj.userID) {
+    return res.status(400).send('U dont own dis');
   }
   res.render("urls_show", templateVars);
 });
