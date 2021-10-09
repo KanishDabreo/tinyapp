@@ -54,26 +54,26 @@ const users = {
 };
 
 //////////////////           HELPER FUNCTIONS        /////////////////
+//generating a string
 const generateRandomString = function() {
   let randomString = Math.random().toString(36).substring(6);
   return randomString;
 };
 
+//authentication of user by email and password
 const authenticateUser = (users, email, password) => {
-  for(const elem in users) {
+  for (const elem in users) {
     let currUser = users[elem];
     if (currUser.email === email) {
-      //if (userDb[email].password === password) {
       if (bcrypt.compareSync(password, currUser.password)) {
-        console.log("correct password");
         return {user: currUser, error: null};
       }
       return {user: null, error: 'incorrect password'};
     }
-    return {user: null, error: 'incorrect email'};
   }
+  return {user: null, error: 'incorrect email'};
 };
-
+//generate a user id as a random string
 const createUser = function(email, password, users) {
   const userId = generateRandomString();
   users[userId] = {
@@ -81,7 +81,6 @@ const createUser = function(email, password, users) {
     email,
     password
   };
-  console.log(users);
   return userId;
 };
 
@@ -114,10 +113,10 @@ app.get("/urls", (req, res) => {
     return res.status(400).send('Please Login');
   }
   const ownedUrls = {}; //result of loop
-  for(const elem in urlDatabase) {
-    let currUrl = urlDatabase[elem]
-    if(currUrl.userID === username.id) {
-    ownedUrls[elem] = currUrl
+  for (const elem in urlDatabase) {
+    let currUrl = urlDatabase[elem];
+    if (currUrl.userID === username.id) {
+      ownedUrls[elem] = currUrl;
     }
   }
   templateVars.urls = ownedUrls;
@@ -164,25 +163,22 @@ app.get("/u/:shortURL", (req, res) => {
   }
   res.redirect(longURL);
 });
+
 /////////////////           REGISTER GET          /////////////////
+//displays registration page
 app.get("/register", (req, res) => {
-  // const username = users[req.session.user_id];
-  // const loggedUsername = users[username];
   const templateVars = {
     username: null
   };
-  console.log("we registered");
-  // if (loggedUsername) {
-  //   return res.redirect('/urls');
-  // }
   res.render("urls_register", templateVars);
 });
+
 /////////////////             LOGIN GET           /////////////////
+//displays login page
 app.get("/login", (req, res) => {
   const templateVars = {
     username: null
   };
-  // display the register form
   res.render('urls_login', templateVars);
 });
 
@@ -200,8 +196,8 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
-
 ///////////////////      EDIT POST (urls_show)    ///////////////////
+//ability to edit url only when user is logged in
 app.post("/urls/:shortURL", (req, res) => {
   const username = users[req.session.user_id];
   const shortURL = req.params.shortURL;
@@ -219,6 +215,7 @@ app.post("/urls/:shortURL", (req, res) => {
 });
 
 //////////////////            DELETE URL           /////////////////
+//deletes url from list on index page
 app.post("/urls/:shortURL/delete", (req, res) => {
   const username = users[req.session.user_id];
   const shortURL = req.params.shortURL;
@@ -236,10 +233,10 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 /////////////////             LOGIN  POST          /////////////////
+// login action after authentication passes or fails
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  // const userFound = findUsersByEmail(users, email);
   const username = authenticateUser(users, email, password);
   if (username.user) {
     req.session.user_id = username.user.id;
@@ -249,12 +246,14 @@ app.post("/login", (req, res) => {
 });
 
 /////////////////             LOGOUT  POST         /////////////////
+//logout by closing users data and redirecting to index
 app.post("/logout", (req, res) => {
   req.session = null;
   res.redirect("/urls");
 });
 
 /////////////////           REGISTER POST         /////////////////
+//action when registering. Compares with user database to ensure no duplicates
 app.post("/register", (req, res) => {
   const email = req.body.email;
   if (!email || !req.body.password) {
